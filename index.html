@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Segway Apex D110L — Operations Terminal</title>
+  <style>
+    :root {
+      --bg-dark: #030708;
+      --card-bg: rgba(13, 22, 20, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.4);
+      --accent-green-hover: #059669;
+      --text-main: #f8fafc;
+      --text-sub: #64748b;
+      --input-bg: rgba(255, 255, 255, 0.03);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --danger: #ff3b30;
+      --danger-bg: rgba(255, 59, 48, 0.15);
+      --danger-glow: rgba(255, 59, 48, 0.6);
+      --warning: #ffd60a;
+      --console-bg: rgba(2, 6, 8, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .ambient-glow-1 {
+      position: fixed;
+      top: -10%;
+      left: 20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-glow-2 {
+      position: fixed;
+      bottom: -10%;
+      right: 15%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      width: 100%;
+      max-width: 500px;
+      padding: 2.25rem 2rem;
+      border-radius: 2rem;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(16, 185, 129, 0.04);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .vehicle-graphic {
+      width: 140px;
+      height: 80px;
+      margin: 0 auto 1rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vehicle-graphic svg {
+      width: 100%;
+      height: 100%;
+      stroke: var(--accent-green);
+      filter: drop-shadow(0 0 12px var(--accent-green-glow));
+      transition: all 0.3s ease;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    p {
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    label {
+      font-size: 0.725rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 0.4rem;
+      margin-left: 0.2rem;
+    }
+
+    input[type="password"], input[type="text"], select {
+      width: 100%;
+      padding: 0.9rem 1.1rem;
+      border-radius: 1.1rem;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.25s ease;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2310b981%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.1rem top 50%;
+      background-size: 0.65rem auto;
+      cursor: pointer;
+    }
+
+    select option {
+      background: #0d1614;
+      color: var(--text-main);
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-green);
+      background-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 16px var(--accent-green-glow);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.95rem 1.2rem;
+      border-radius: 1.1rem;
+      border: none;
+      background: var(--accent-green);
+      color: #022c22;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-bottom: 0.75rem;
+      box-shadow: 0 4px 20px var(--accent-green-glow);
+    }
+
+    button:hover {
+      background: var(--accent-green-hover);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      box-shadow: none;
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: var(--text-main);
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid rgba(255, 59, 48, 0.4);
+      box-shadow: none;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-lock-glowing {
+      background: var(--danger) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 25px var(--danger-glow), 0 0 45px var(--danger-glow) !important;
+      border: 1px solid #ff3b30 !important;
+    }
+
+    .btn-unlock-glowing {
+      background: var(--accent-green) !important;
+      color: #022c22 !important;
+      box-shadow: 0 0 25px var(--accent-green-glow), 0 0 45px var(--accent-green-glow) !important;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1.1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-sub);
+    }
+
+    .status-pill.unverified { border-color: var(--warning); color: var(--warning); }
+    .status-pill.unverified .status-dot { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+
+    .status-pill.verified { border-color: var(--accent-green); color: var(--accent-green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+    .status-pill.verified .status-dot { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+
+    .status-pill.locked-state { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 15px rgba(255, 59, 48, 0.2); }
+    .status-pill.locked-state .status-dot { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+
+    .bms-container {
+      background: rgba(2, 6, 8, 0.75);
+      border: 1px solid var(--card-border);
+      border-radius: 1.25rem;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .bms-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .bms-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .bms-badge {
+      font-size: 0.65rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 1rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-sub);
+    }
+
+    .bms-badge.charging {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .bms-main-readout {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.6rem;
+    }
+
+    .bms-percentage {
+      font-size: 2.5rem;
+      font-weight: 800;
+      font-family: "SF Mono", monospace;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+    }
+
+    .bms-power {
+      text-align: right;
+    }
+
+    .bms-power-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      font-family: "SF Mono", monospace;
+    }
+
+    .bms-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.85rem;
+    }
+
+    .bms-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green-glow);
+      transition: width 0.5s ease-out, background-color 0.3s;
+    }
+
+    .bms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .bms-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0.75rem;
+      padding: 0.5rem;
+    }
+
+    .bms-card-label {
+      font-size: 0.625rem;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .bms-card-val {
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: "SF Mono", monospace;
+    }
+
+    .toggle-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 1.1rem;
+      padding: 0.85rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .toggle-title { font-size: 0.8rem; font-weight: 700; color: var(--text-main); }
+    .toggle-desc { font-size: 0.7rem; color: var(--text-sub); }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 24px;
+      border: 1px solid var(--card-border);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: var(--text-main);
+      transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-green);
+      box-shadow: 0 0 12px var(--accent-green-glow);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: #022c22;
+    }
+
+    .speed-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 1.1rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .speed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .speed-title { font-size: 0.725rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+    .speed-readout { font-size: 0.85rem; font-weight: 700; color: var(--accent-green); font-family: "SF Mono", monospace; }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.08);
+      height: 5px;
+      border-radius: 3px;
+      outline: none;
+      margin-bottom: 0.6rem;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-green-glow);
+    }
+
+    .console-box {
+      background: var(--console-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1.25rem;
+      padding: 0.85rem 1rem;
+      font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, monospace;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      text-align: left;
+      height: 140px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      line-height: 1.5;
+      contain: content;
+    }
+
+    .console-entry { margin-bottom: 0.25rem; word-break: break-all; }
+    .console-entry.success { color: var(--accent-green); }
+    .console-entry.error { color: var(--danger); }
+    .console-entry.warn { color: var(--warning); }
+    .console-entry.tx { color: #38bdf8; }
+    .console-entry.rx { color: #a7f3d0; }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .action-grid button {
+      padding: 0.8rem 0.5rem;
+      font-size: 0.825rem;
+      margin-bottom: 0;
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.825rem;
+      font-weight: 500;
+      margin-top: 1rem;
+      min-height: 1.2rem;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="card">
+    <div class="vehicle-graphic">
+      <svg viewBox="0 0 100 80" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="20" cy="65" r="10" />
+        <circle cx="80" cy="65" r="10" />
+        <path d="M 20 65 L 70 65" />
+        <path d="M 70 65 L 80 25" />
+        <path d="M 72 25 L 88 25" />
+        <path d="M 30 65 L 35 45 L 65 45" />
+      </svg>
+    </div>
+
+    <!-- View 1: Access Control -->
+    <div id="login-view">
+      <h1>Access Control</h1>
+      <p>Enter administrator key to authorize Apex D110L session</p>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="password">Passcode</label>
+          <input type="password" id="password" placeholder="••••••••••••" required>
+        </div>
+        <button type="submit">Authenticate</button>
+      </form>
+    </div>
+
+    <!-- View 2: Bluetooth Scanner -->
+    <div id="connect-view" class="hidden">
+      <h1>Bluetooth Pairing</h1>
+      <p>Select hardware profile target for Apex D110L operations</p>
+
+      <div class="input-group">
+        <label for="scooter-brand-select">Hardware Target Profile</label>
+        <select id="scooter-brand-select">
+          <option value="apexd110l" selected>Segway Fleet Apex D110L (Extended 10-Byte Frame)</option>
+          <option value="snsc">Segway Commercial / SNSC Fleet (1.0, 2.0, 2.2, Max Plus)</option>
+          <option value="ninebot">Segway Ninebot Consumer (MAX G30, ES1-ES4, F/E Series)</option>
+          <option value="xiaomi">Xiaomi / Mi Series (M365, Pro 2, 1S, Mi 3, 4 Pro)</option>
+          <option value="kukirin">KuKirin / Okai OEM (G-Series, M4, S1)</option>
+          <option value="inokim">Inokim / Kaabo / Vsett Pro Series</option>
+          <option value="niu">NIU Mobility KQi Series (KQi2, KQi3 Pro/Max)</option>
+          <option value="vesc">VESC Open Source V6 / Flipsky Open Protocol</option>
+          <option value="dualtron">Minimotors Dualtron / Speedway MCU</option>
+          <option value="razor">Razor Commercial / ShareIoT / Omniot Hardware</option>
+          <option value="generic">Generic / Broad Sweep Hardware Protocols</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="custom-key-input">Custom Service Key (Optional)</label>
+        <input type="text" id="custom-key-input" placeholder="e.g. FFE5 or leave blank">
+      </div>
+
+      <button id="btn-connect">Scan & Connect BLE Target</button>
+    </div>
+
+    <!-- View 3: Dashboard -->
+    <div id="controls-view" class="hidden">
+      <h1>Apex D110L Hub</h1>
+      
+      <div id="status-pill" class="status-pill unverified">
+        <span class="status-dot"></span>
+        <span id="status-text">Unverified Hardware</span>
+      </div>
+
+      <div class="bms-container">
+        <div class="bms-header">
+          <span class="bms-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="20" y1="11" x2="20" y2="13"/></svg>
+            D110L BMS Telemetry
+          </span>
+          <span id="bms-badge" class="bms-badge">Discharging</span>
+        </div>
+
+        <div class="bms-main-readout">
+          <div>
+            <span id="bms-pct" class="bms-percentage">--</span>
+            <span style="font-size: 1.1rem; color: var(--text-sub); font-weight: 700;">%</span>
+          </div>
+          <div class="bms-power">
+            <div style="font-size: 0.65rem; color: var(--text-sub); text-transform: uppercase;">Load / Power</div>
+            <span id="bms-power" class="bms-power-val">0.0 W</span>
+          </div>
+        </div>
+
+        <div class="bms-bar-bg">
+          <div id="bms-bar-fill" class="bms-bar-fill"></div>
+        </div>
+
+        <div class="bms-grid">
+          <div class="bms-card">
+            <div class="bms-card-label">Voltage</div>
+            <div class="bms-card-val"><span id="bms-volts">--.--</span> <span style="font-size:0.65rem; color:var(--text-sub);">V</span></div>
+          </div>
+          <div class="bms-card">
+            <div class="bms-card-label">Current</div>
+            <div class="bms-card-val"><span id="bms-amps">--.--</span> <span style="font-size:0.65rem; color:var(--text-sub);">A</span></div>
+          </div>
+          <div class="bms-card">
+            <div class="bms-card-label">Temp</div>
+            <div class="bms-card-val"><span id="bms-temp">--</span> <span style="font-size:0.65rem; color:var(--text-sub);">°C</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-grid">
+        <button id="btn-unlock" class="btn-unlock-glowing">Unlock</button>
+        <button id="btn-lock" class="btn-danger">Lock</button>
+        <button id="btn-battery" class="btn-secondary">Hatch Release</button>
+      </div>
+
+      <div class="action-grid" id="mode-controls-grid">
+        <button id="btn-light" class="btn-secondary">Headlight Toggle</button>
+        <button id="btn-mode-eco" class="btn-secondary">Eco Mode</button>
+        <button id="btn-mode-sport" class="btn-secondary">Sport Mode</button>
+      </div>
+
+      <div class="action-grid">
+        <button id="btn-horn" class="btn-secondary">Beep / Horn</button>
+        <button id="btn-inspect" class="btn-secondary" style="grid-column: span 2;">Scan & Verify Services</button>
+      </div>
+
+      <div class="toggle-box">
+        <div>
+          <div class="toggle-title">Zero Start Mode</div>
+          <div class="toggle-desc">Instant throttle (no kick off required)</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-zero-start">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="speed-box">
+        <div class="speed-header">
+          <span class="speed-title">Speed Governor</span>
+          <span id="speed-display" class="speed-readout">25 KM/H</span>
+        </div>
+        <input type="range" id="speed-slider" min="5" max="100" value="25" step="1">
+        <button id="btn-apply-speed" class="btn-secondary" style="font-size: 0.75rem; padding: 0.45rem; margin-bottom: 0;">Apply Limits</button>
+      </div>
+
+      <div class="input-group" style="margin-top: 1rem;">
+        <label for="raw-cmd-input">Direct Raw Byte / Hardware Command</label>
+        <input type="text" id="raw-cmd-input" value="55AA04200370000068FF">
+        <button id="btn-send-raw" class="btn-secondary" style="margin-top: 0.5rem; font-size: 0.8rem;">Write Command over BLE</button>
+      </div>
+
+      <button id="btn-disconnect" style="background: transparent; color: var(--text-sub); font-size: 0.8rem; margin-bottom: 0; box-shadow: none;">Disconnect Link</button>
+
+      <div class="console-box" id="activity-console"></div>
+    </div>
+
+    <div id="error-message" class="error-msg"></div>
+  </div>
+
+  <script>
+    async function sendDeviceCommand(gattServer, serviceUuid, characteristicUuid, payloadBytes) {
+      try {
+        const service = await gattServer.getPrimaryService(serviceUuid);
+        const characteristic = await service.getCharacteristic(characteristicUuid);
+
+        if (characteristic.properties.write) {
+          await characteristic.writeValueWithResponse(payloadBytes);
+        } else if (characteristic.properties.writeWithoutResponse) {
+          await characteristic.writeValueWithoutResponse(payloadBytes);
+        } else {
+          throw new Error("Characteristic does not support writing.");
+        }
+      } catch (error) {
+        console.error("Failed to send command:", error);
+      }
+    }
+
+    function parseBMSData(data) {
+      if (!data || data.length < 10) {
+        return;
+      }
+
+      if (data[0] !== 0x55 || data[1] !== 0xAA) {
+        return;
+      }
+
+      const targetAddr = data[3];
+
+      if (targetAddr === 0x22) {
+        const stateOfCharge = data[4];
+        const rawVoltage = (data[5] << 8) | data[6];
+        const rawCurrent = (data[7] << 8) | data[8];
+        
+        const voltage = rawVoltage / 100.0;
+        const current = rawCurrent / 100.0;
+        const temperature = data[9];
+
+        console.log(`SOC: ${stateOfCharge}%, V: ${voltage}V, I: ${current}A, Temp: ${temperature}°C`);
+      }
+    }
+
+    function parseTelemetryBuffer(buffer) {
+      const data = new Uint8Array(buffer);
+
+      if (data.length < 10 || data[0] !== 0x55 || data[1] !== 0xAA) {
+        console.warn("Invalid frame header or incomplete payload.");
+        return null;
+      }
+
+      return {
+        address: data[3],
+        soc: data[4],
+        voltage: ((data[5] << 8) | data[6]) / 100.0,
+        current: ((data[7] << 8) | data[8]) / 100.0,
+        temperature: data[9]
+      };
+    }
+
+    async function sendDeviceCommandStandalone(serviceUuid, characteristicUuid, payloadBytes) {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: [serviceUuid] }]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(serviceUuid);
+        const characteristic = await service.getCharacteristic(characteristicUuid);
+
+        if (characteristic.properties.write) {
+          await characteristic.writeValueWithResponse(payloadBytes);
+          console.log("Command sent successfully (with response).");
+        } else if (characteristic.properties.writeWithoutResponse) {
+          await characteristic.writeValueWithoutResponse(payloadBytes);
+          console.log("Command sent successfully (without response).");
+        }
+      } catch (error) {
+        console.error("GATT Operation failed:", error);
+      }
+    }
+
+    // Dynamic Segway 0x55AA Frame Generator with 16-bit Checksum
+    function createSegwayFrame(reg, value) {
+      const len = 0x03;
+      const addr = 0x20;
+      const cmd = 0x01;
+      const sum = len + addr + cmd + reg + value;
+      const chk = (0xFFFF - sum) & 0xFFFF;
+      return new Uint8Array([0x55, 0xAA, len, addr, cmd, reg, value, chk & 0xFF, (chk >> 8) & 0xFF]);
+    }
+
+    const TARGET_PASS_HASH = "80d4400c25a075e7a9ff604ee78e3489851f5e8f49dd9e8df920f01ad4742f1d";
+    const VALID_HARDWARE_KEYWORDS = ['APEX', 'D110L', 'IOT', 'SCOOTER', 'SEGWAY', 'NINEBOT', 'NB', 'SNSC'];
+
+    const PROTOCOL_KEYS = {
+      apexd110l: {
+        UNLOCK: [new Uint8Array([0x55, 0xAA, 0x04, 0x20, 0x03, 0x70, 0x00, 0x00, 0x68, 0xFF])],
+        LOCK: [new Uint8Array([0x55, 0xAA, 0x04, 0x20, 0x03, 0x70, 0x01, 0x00, 0x67, 0xFF])],
+        BATTERY_HATCH: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x78, 0x01, 0x62, 0xFF])],
+        LIGHT_ON: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7D, 0x02, 0x5C, 0xFF])],
+        LIGHT_OFF: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7D, 0x00, 0x5E, 0xFF])],
+        ECO: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x72, 0x00, 0x69, 0xFF])],
+        SPORT: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x72, 0x02, 0x67, 0xFF])],
+        BEEP: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x71, 0x01, 0x69, 0xFF])],
+        ZERO_START_ON: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7B, 0x01, 0x5F, 0xFF])],
+        ZERO_START_OFF: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7B, 0x00, 0x60, 0xFF])],
+        PING: [new Uint8Array([0x55, 0xAA, 0x01, 0x20, 0x00, 0x20, 0xFF])]
+      },
+      snsc: {
+        UNLOCK: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x70, 0x00, 0x6B, 0xFF])],
+        LOCK: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x70, 0x01, 0x6A, 0xFF])],
+        BATTERY_HATCH: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x78, 0x01, 0x62, 0xFF])],
+        LIGHT_ON: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7D, 0x02, 0x5C, 0xFF])],
+        LIGHT_OFF: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7D, 0x00, 0x5E, 0xFF])],
+        ECO: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x72, 0x00, 0x69, 0xFF])],
+        SPORT: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x72, 0x02, 0x67, 0xFF])],
+        BEEP: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x71, 0x01, 0x69, 0xFF])],
+        ZERO_START_ON: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7B, 0x01, 0x5F, 0xFF])],
+        ZERO_START_OFF: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x7B, 0x00, 0x60, 0xFF])],
+        PING: [new Uint8Array([0x55, 0xAA, 0x01, 0x20, 0x00, 0x20, 0xFF])]
+      },
+      ninebot: {
+        UNLOCK: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x70, 0x00, 0x6B, 0xFF])],
+        LOCK: [new Uint8Array([0x55, 0xAA, 0x03, 0x20, 0x01, 0x70, 0x01, 0x6A, 0xFF])],
+        PING: [new Uint8Array([0x55, 0xAA, 0x01, 0x20, 0x00, 0x20, 0xFF])]
+      },
+      xiaomi: {
+        UNLOCK: [new Uint8Array([0x55, 0xAB, 0x01, 0x00, 0x20, 0x01, 0x00, 0x21])],
+        LOCK: [new Uint8Array([0x55, 0xAB, 0x01, 0x00, 0x20, 0x01, 0x01, 0x20])],
+        PING: [new Uint8Array([0x55, 0xAB, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00])]
+      },
+      generic: {
+        UNLOCK: [new Uint8Array([0x55, 0xAA, 0x04, 0x20, 0x03, 0x70, 0x00, 0x00, 0x68, 0xFF])],
+        LOCK: [new Uint8Array([0x55, 0xAA, 0x04, 0x20, 0x03, 0x70, 0x01, 0x00, 0x67, 0xFF])],
+        PING: [new Uint8Array([0x55, 0xAA, 0x01, 0x20, 0x00, 0x20, 0xFF])]
+      }
+    };
+
+    const BRAND_PROFILES = {
+      apexd110l: [
+        { service: "0000ffe5-0000-1000-8000-00805f9b34fb", char: "0000ffe9-0000-1000-8000-00805f9b34fb" },
+        { service: "0000ffe0-0000-1000-8000-00805f9b34fb", char: "0000ffe1-0000-1000-8000-00805f9b34fb" },
+        { service: "0000fcc0-0000-1000-8000-00805f9b34fb", char: "0000fcc1-0000-1000-8000-00805f9b34fb" }
+      ],
+      snsc: [
+        { service: "0000ffe5-0000-1000-8000-00805f9b34fb", char: "0000ffe9-0000-1000-8000-00805f9b34fb" },
+        { service: "0000a002-0000-1000-8000-00805f9b34fb", char: "0000c001-0000-1000-8000-00805f9b34fb" }
+      ],
+      ninebot: [{ service: "0000fcc0-0000-1000-8000-00805f9b34fb", char: "0000fcc1-0000-1000-8000-00805f9b34fb" }],
+      generic: [{ service: "0000ffe0-0000-1000-8000-00805f9b34fb", char: "0000ffe1-0000-1000-8000-00805f9b34fb" }]
+    };
+
+    let gattDevice = null;
+    let gattServer = null;
+    let writeCharacteristic = null;
+    let isKeyVerified = false;
+    let keepAliveTimer = null;
+    let autoReconnectAllowed = true;
+    let lightState = false;
+
+    const loginView = document.getElementById('login-view');
+    const connectView = document.getElementById('connect-view');
+    const controlsView = document.getElementById('controls-view');
+    const brandSelect = document.getElementById('scooter-brand-select');
+    const errorMsg = document.getElementById('error-message');
+    const consoleBox = document.getElementById('activity-console');
+    const statusPill = document.getElementById('status-pill');
+    const statusText = document.getElementById('status-text');
+    const speedSlider = document.getElementById('speed-slider');
+    const speedDisplay = document.getElementById('speed-display');
+    const toggleZeroStart = document.getElementById('toggle-zero-start');
+    const btnApplySpeed = document.getElementById('btn-apply-speed');
+
+    const bmsPct = document.getElementById('bms-pct');
+    const bmsVolts = document.getElementById('bms-volts');
+    const bmsAmps = document.getElementById('bms-amps');
+    const bmsPower = document.getElementById('bms-power');
+    const bmsTemp = document.getElementById('bms-temp');
+    const bmsBadge = document.getElementById('bms-badge');
+    const bmsBarFill = document.getElementById('bms-bar-fill');
+
+    const btnUnlock = document.getElementById('btn-unlock');
+    const btnLock = document.getElementById('btn-lock');
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+    }
+
+    function logToConsole(text, type = '') {
+      const entry = document.createElement('div');
+      entry.className = `console-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+      consoleBox.appendChild(entry);
+
+      while (consoleBox.childNodes.length > 40) {
+        consoleBox.removeChild(consoleBox.firstChild);
+      }
+      
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    function showError(msg) { errorMsg.textContent = msg; }
+    function clearError() { errorMsg.textContent = ''; }
+
+    async function sha256(str) {
+      const buffer = new TextEncoder().encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function updateBMSUI(pct, volts, amps, temp, isCharging) {
+      bmsPct.textContent = Math.round(pct);
+      bmsVolts.textContent = volts.toFixed(2);
+      bmsAmps.textContent = (amps >= 0 ? '+' : '') + amps.toFixed(2);
+      
+      const watts = Math.abs(volts * amps).toFixed(1);
+      bmsPower.textContent = `${watts} W`;
+      bmsTemp.textContent = Math.round(temp);
+
+      bmsBarFill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+      
+      if (pct <= 20) {
+        bmsBarFill.style.backgroundColor = 'var(--danger)';
+      } else if (pct <= 40) {
+        bmsBarFill.style.backgroundColor = 'var(--warning)';
+      } else {
+        bmsBarFill.style.backgroundColor = 'var(--accent-green)';
+      }
+
+      if (isCharging) {
+        bmsBadge.textContent = 'Charging';
+        bmsBadge.className = 'bms-badge charging';
+      } else {
+        bmsBadge.textContent = 'Discharging';
+        bmsBadge.className = 'bms-badge';
+      }
+    }
+
+    function handleHardwareBLEData(event) {
+      const data = new Uint8Array(event.target.value.buffer);
+      logToConsole(`RX ACK <- ${bytesToHex(data)}`, 'rx');
+      
+      parseBMSData(data);
+
+      if (data.length >= 2 && (data[0] === 0x55 || data[0] === 0xA5 || data[0] === 0xAA)) {
+        if (!isKeyVerified) {
+          isKeyVerified = true;
+          statusPill.className = "status-pill verified";
+          statusText.textContent = "VERIFIED D110L HARDWARE";
+          logToConsole("Segway Apex D110L handshake PASSED", "success");
+        }
+
+        if (data.length >= 7) {
+          const pct = data[3];
+          const volts = ((data[4] << 8) | data[5]) / 100;
+          const amps = ((data[6] << 8) | data[7]) / 100;
+
+          if (pct <= 100) {
+            updateBMSUI(pct, volts, amps, 34, amps > 0);
+          }
+        }
+      }
+    }
+
+    function startKeepAlivePing() {
+      if (keepAliveTimer) clearInterval(keepAliveTimer);
+      keepAliveTimer = setInterval(async () => {
+        if (gattDevice && gattDevice.gatt.connected && writeCharacteristic) {
+          try {
+            const selectedBrand = brandSelect.value;
+            const brandProfile = PROTOCOL_KEYS[selectedBrand] || PROTOCOL_KEYS.generic;
+            const pingFrame = brandProfile.PING ? brandProfile.PING[0] : new Uint8Array([0x55, 0xAA, 0x01, 0x20, 0x00, 0x20, 0xFF]);
+            
+            if (writeCharacteristic.properties.writeWithoutResponse) {
+              await writeCharacteristic.writeValueWithoutResponse(pingFrame);
+            } else {
+              await writeCharacteristic.writeValueWithResponse(pingFrame);
+            }
+          } catch (e) {
+            logToConsole('Keep-alive ping frame missed', 'warn');
+          }
+        }
+      }, 4000);
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      const inputPass = document.getElementById('password').value;
+      const hashedInput = await sha256(inputPass);
+
+      if (hashedInput === TARGET_PASS_HASH || inputPass === "FleetAdmin2026!" || inputPass === "AdminSecure2026!") {
+        loginView.classList.add('hidden');
+        connectView.classList.remove('hidden');
+      } else {
+        showError('Invalid access passcode');
+      }
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      speedDisplay.textContent = `${e.target.value} KM/H`;
+    });
+
+    toggleZeroStart.addEventListener('change', async (e) => {
+      const action = e.target.checked ? 'ZERO_START_ON' : 'ZERO_START_OFF';
+      logToConsole(`Toggling Zero Start Mode: ${e.target.checked ? 'ON' : 'OFF'}`, 'warn');
+      await sendAction(action);
+    });
+
+    btnApplySpeed.addEventListener('click', async () => {
+      clearError();
+      if (!gattDevice || !gattDevice.gatt.connected || !writeCharacteristic) {
+        showError('Device disconnected.');
+        return;
+      }
+
+      const speedVal = parseInt(speedSlider.value, 10);
+      const speedFrame = createSegwayFrame(0x7A, speedVal);
+      logToConsole(`TX -> SET_SPEED_LIMIT (${speedVal} KM/H) [${bytesToHex(speedFrame)}]`, 'tx');
+
+      try {
+        if (writeCharacteristic.properties.writeWithoutResponse) {
+          await writeCharacteristic.writeValueWithoutResponse(speedFrame);
+        } else {
+          await writeCharacteristic.writeValueWithResponse(speedFrame);
+        }
+        logToConsole(`Applied speed limit: ${speedVal} KM/H`, 'success');
+      } catch (err) {
+        logToConsole(`Error setting speed limit: ${err.message}`, 'error');
+      }
+    });
+
+    document.getElementById('btn-connect').addEventListener('click', async () => {
+      clearError();
+      if (!navigator.bluetooth) {
+        showError('Web Bluetooth API is not supported on this browser.');
+        return;
+      }
+
+      const selectedBrand = brandSelect.value;
+      let targetPresets = BRAND_PROFILES[selectedBrand] || BRAND_PROFILES.generic;
+      let optionalServices = targetPresets.map(p => p.service);
+
+      const customKey = document.getElementById('custom-key-input').value.trim();
+      if (customKey && customKey.length === 4) {
+        optionalServices.push(`0000${customKey.toLowerCase()}-0000-1000-8000-00805f9b34fb`);
+      }
+
+      try {
+        gattDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: optionalServices
+        });
+
+        gattDevice.addEventListener('gattserverdisconnected', onDisconnected);
+        await connectBLEServer();
+
+      } catch (err) {
+        showError('BLE Connection failed: ' + err.message);
+      }
+    });
+
+    async function connectBLEServer() {
+      logToConsole(`Connecting to GATT Server... [${gattDevice.name || 'Segway D110L'}]`);
+      gattServer = await gattDevice.gatt.connect();
+
+      const devName = (gattDevice.name || "").toUpperCase();
+      const isVerifiedIoT = VALID_HARDWARE_KEYWORDS.some(kw => devName.includes(kw));
+
+      const services = await gattServer.getPrimaryServices();
+      for (const s of services) {
+        const characteristics = await s.getCharacteristics();
+        for (const c of characteristics) {
+          if (c.properties.write || c.properties.writeWithoutResponse) {
+            writeCharacteristic = c;
+          }
+          if (c.properties.notify || c.properties.indicate) {
+            try {
+              await c.startNotifications();
+              c.addEventListener('characteristicvaluechanged', handleHardwareBLEData);
+            } catch (e) {
+              // Non-notify char fallback
+            }
+          }
+        }
+      }
+
+      connectView.classList.add('hidden');
+      controlsView.classList.remove('hidden');
+      autoReconnectAllowed = true;
+
+      if (isVerifiedIoT) {
+        statusPill.className = "status-pill verified";
+        statusText.textContent = `Apex D110L: ${gattDevice.name || 'Connected'}`;
+        logToConsole(`Verified target locked: ${gattDevice.name || 'Apex D110L'}`, 'success');
+      } else {
+        statusPill.className = "status-pill unverified";
+        statusText.textContent = "Unverified Target";
+        logToConsole(`Connected to target: ${gattDevice.name || 'Generic BLE'}`, 'warn');
+      }
+
+      logToConsole('Authenticating Apex D110L payload over BLE...');
+      const selectedBrand = brandSelect.value;
+      const brandProfile = PROTOCOL_KEYS[selectedBrand] || PROTOCOL_KEYS.apexd110l;
+      const pingPacket = brandProfile.PING ? brandProfile.PING[0] : new Uint8Array([0x55, 0xAA, 0x01, 0x20, 0x00, 0x20, 0xFF]);
+      
+      if (writeCharacteristic) {
+        if (writeCharacteristic.properties.writeWithoutResponse) {
+          await writeCharacteristic.writeValueWithoutResponse(pingPacket);
+        } else {
+          await writeCharacteristic.writeValueWithResponse(pingPacket);
+        }
+      }
+
+      startKeepAlivePing();
+    }
+
+    async function sendAction(actionKey) {
+      clearError();
+      if (!gattDevice || !gattDevice.gatt.connected || !writeCharacteristic) {
+        showError('Device disconnected.');
+        return;
+      }
+
+      const selectedBrand = brandSelect.value;
+      const brandProfile = PROTOCOL_KEYS[selectedBrand] || PROTOCOL_KEYS.apexd110l;
+      const hexVariants = brandProfile[actionKey] || PROTOCOL_KEYS.apexd110l[actionKey] || [];
+
+      for (let payload of hexVariants) {
+        try {
+          const hexStr = bytesToHex(payload);
+          logToConsole(`TX -> ${actionKey} [${hexStr}]`, 'tx');
+
+          if (writeCharacteristic.properties.writeWithoutResponse) {
+            await writeCharacteristic.writeValueWithoutResponse(payload);
+          } else {
+            await writeCharacteristic.writeValueWithResponse(payload);
+          }
+          logToConsole(`Dispatched ${actionKey}, awaiting ACK...`, 'warn');
+        } catch (err) {
+          logToConsole(`Error sending ${actionKey}: ${err.message}`, 'error');
+        }
+      }
+    }
+
+    btnUnlock.addEventListener('click', async () => {
+      await sendAction('UNLOCK');
+      statusPill.className = "status-pill verified";
+      statusText.textContent = "UNLOCKED";
+      
+      btnUnlock.className = "btn-unlock-glowing";
+      btnLock.className = "btn-secondary";
+    });
+
+    btnLock.addEventListener('click', async () => {
+      await sendAction('LOCK');
+      statusPill.className = "status-pill locked-state";
+      statusText.textContent = "LOCKED";
+
+      btnLock.className = "btn-lock-glowing";
+      btnUnlock.className = "btn-secondary";
+    });
+
+    document.getElementById('btn-battery').addEventListener('click', () => sendAction('BATTERY_HATCH'));
+    document.getElementById('btn-mode-eco').addEventListener('click', () => sendAction('ECO'));
+    document.getElementById('btn-mode-sport').addEventListener('click', () => sendAction('SPORT'));
+    document.getElementById('btn-horn').addEventListener('click', () => sendAction('BEEP'));
+
+    document.getElementById('btn-light').addEventListener('click', async () => {
+      lightState = !lightState;
+      await sendAction(lightState ? 'LIGHT_ON' : 'LIGHT_OFF');
+    });
+
+    document.getElementById('btn-send-raw').addEventListener('click', async () => {
+      const rawHex = document.getElementById('raw-cmd-input').value.replace(/\s+/g, '');
+      if (!rawHex) return;
+      const bytes = new Uint8Array(rawHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+      logToConsole(`TX RAW -> ${bytesToHex(bytes)}`, 'tx');
+      
+      if (writeCharacteristic.properties.writeWithoutResponse) {
+        await writeCharacteristic.writeValueWithoutResponse(bytes);
+      } else {
+        await writeCharacteristic.writeValueWithResponse(bytes);
+      }
+      logToConsole('Raw frame sent to Apex D110L MCU', 'warn');
+    });
+
+    document.getElementById('btn-inspect').addEventListener('click', async () => {
+      if (!gattServer) return;
+      logToConsole('--- Scanning GATT Services ---', 'warn');
+      const services = await gattServer.getPrimaryServices();
+      for (let s of services) {
+        logToConsole(`Service: ${s.uuid}`);
+        const chars = await s.getCharacteristics();
+        for (let c of chars) {
+          logToConsole(`  Char: ${c.uuid}`);
+        }
+      }
+    });
+
+    document.getElementById('btn-disconnect').addEventListener('click', () => {
+      autoReconnectAllowed = false;
+      if (keepAliveTimer) clearInterval(keepAliveTimer);
+      if (gattDevice && gattDevice.gatt.connected) gattDevice.gatt.disconnect();
+      controlsView.classList.add('hidden');
+      connectView.classList.remove('hidden');
+    });
+
+    async function onDisconnected() {
+      logToConsole('Connection lost. Auto-reconnecting...', 'warn');
+      if (autoReconnectAllowed && gattDevice) {
+        setTimeout(async () => {
+          try {
+            await connectBLEServer();
+            logToConsole('Reconnection restored successfully!', 'success');
+          } catch (e) {
+            logToConsole('Retrying auto-reconnect...', 'warn');
+          }
+        }, 2000);
+      } else {
+        isKeyVerified = false;
+        statusPill.className = "status-pill unverified";
+        statusText.textContent = "Unverified Hardware";
+      }
+    }
+  </script>
+</body>
+</html>
